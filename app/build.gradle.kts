@@ -69,4 +69,34 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("androidx.room:room-runtime:2.5.0")
     ksp("androidx.room:room-compiler:2.5.0")
+    implementation("androidx.room:room-ktx:2.6.0")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // Coil para carregar as imagens
+    implementation("io.coil-kt:coil-compose:2.0.0")
+
+    // OkHttp para gerenciar as requisições HTTP
+    implementation("com.squareup.okhttp3:okhttp:4.9.0")
+    // Retrofit para realizar chamadas HTTP
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+
+    // Conversor Gson para Retrofit
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // Coroutine para Retrofit (para chamadas assíncronas)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+
+    // Para Coil (biblioteca de imagem) se você precisar exibir imagens dos filmes
+    implementation("io.coil-kt:coil-compose:2.0.0")
+
+    // Room para banco de dados local
+    implementation("androidx.room:room-runtime:2.5.0")
+    implementation("androidx.room:room-ktx:2.5.0")
+
+    // Para usar as anotações do Room com Kotlin (compatível com o KAPT)
+    ksp("androidx.room:room-compiler:2.5.0")
+
+    // Para o Retrofit funcionar com coroutines
+    implementation("com.squareup.retrofit2:adapter-rxjava2:2.9.0")
 }
