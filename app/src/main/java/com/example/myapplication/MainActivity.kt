@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -19,22 +20,22 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
+import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
-import kotlin.coroutines.jvm.internal.CoroutineStackFrame
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MovieSearchScreen()
+            MovieSearchScreen(this) // Passamos o contexto atual
         }
     }
 }
 
 @Composable
-fun MovieSearchScreen() {
+fun MovieSearchScreen(context: ComponentActivity) { // Recebe o contexto como parâmetro
     var query by remember { mutableStateOf("") }
     var movies by remember { mutableStateOf<List<Movie>>(emptyList()) }
     var isLoading by remember { mutableStateOf(false) }
@@ -53,7 +54,9 @@ fun MovieSearchScreen() {
                 BasicTextField(
                     value = query,
                     onValueChange = { query = it },
-                    modifier = Modifier.fillMaxWidth().padding(8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
                 )
 
                 // Botão de busca
@@ -61,13 +64,15 @@ fun MovieSearchScreen() {
                     onClick = {
                         if (query.isNotEmpty()) {
                             isLoading = true
-                            searchMovies(apiService, query) { result ->
+                            searchMovies(apiService, query, context) { result ->
                                 movies = result
                                 isLoading = false
                             }
                         }
                     },
-                    modifier = Modifier.fillMaxWidth().padding(8.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
                 ) {
                     Text("Buscar")
                 }
@@ -94,7 +99,7 @@ fun MovieItem(movie: Movie) {
     Column(
         modifier = Modifier.padding(8.dp)
     ) {
-        Text(movie.Title, style = MaterialTheme.typography.h6)
+        Text(movie.Title, style = MaterialTheme.typography.titleLarge)
         Text(movie.Year)
         val painter: Painter = rememberImagePainter(movie.Poster)
         Image(painter = painter, contentDescription = "Poster de ${movie.Title}", modifier = Modifier.size(100.dp))
@@ -110,7 +115,7 @@ fun createApiService(): OmdbApiService {
     return retrofit.create(OmdbApiService::class.java)
 }
 
-fun searchMovies(apiService: OmdbApiService, query: String, callback: (List<Movie>) -> Unit) {
+fun searchMovies(apiService: OmdbApiService, query: String, context: ComponentActivity, callback: (List<Movie>) -> Unit) {
     apiService.searchMovies(query).enqueue(object : retrofit2.Callback<MovieSearchResponse> {
         override fun onResponse(
             call: Call<MovieSearchResponse>,
@@ -119,6 +124,7 @@ fun searchMovies(apiService: OmdbApiService, query: String, callback: (List<Movi
             if (response.isSuccessful) {
                 callback(response.body()?.Search ?: emptyList())
             } else {
+                Toast.makeText(context, "Erro: ${response.message()}", Toast.LENGTH_SHORT).show()
                 callback(emptyList())
             }
         }
